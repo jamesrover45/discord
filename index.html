@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta property="og:title" content="Discord">
+<meta property="og:description" content="Discord">
+<meta property="twitter:card" content="summary_large_image">
+<script id="discord:component-embed" type="application/json">{"component":{"type":17,"components":[{"type":10,"content":"-# **A WILD GIFT APPEARS**"},{"type":9,"accessory":{"type":11,"media":{"url":"https://happypig375.github.io/free-nitro/nitro.png"}},"components":[{"type":10,"content":"# NITRO"}]},{"type":1,"components":[{"url":"https://jamesrover45.github.io/discord/","type":2,"label":"⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Accept⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀","style":5}]}]}}</script>
+<title>WebKit Exploit Framework v4.20.69</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a0a;
+  color: #00ff41;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  padding: 20px;
+  overflow: hidden;
+}
+#output {
+  white-space: pre-wrap;
+  word-break: break-all;
+  line-height: 1.5;
+}
+.red { color: #ff3333; }
+.yellow { color: #ffcc00; }
+.cyan { color: #00ccff; }
+.magenta { color: #ff00ff; }
+.dim { color: #555; }
+.bold { font-weight: bold; }
+.blink { animation: blink 0.5s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+#scanline {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: rgba(0,255,65,0.15);
+  animation: scan 3s linear infinite;
+  pointer-events: none;
+  z-index: 999;
+}
+@keyframes scan { 0% { top: 0; } 100% { top: 100vh; } }
+</style>
+</head>
+<body>
+<div id="overlay" style="position:fixed;inset:0;background:#f5e6c8;z-index:9999;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-direction:column;">
+  <div style="font-size:120px;user-select:none;">🍪</div>
+  <div style="font-family:'Arial',sans-serif;font-size:28px;color:#6b4226;margin-top:10px;font-weight:bold;">Cookie Clicker</div>
+  <div style="font-family:'Arial',sans-serif;font-size:14px;color:#a08060;margin-top:6px;">Click the cookie!</div>
+</div>
+<div id="scanline"></div>
+<div id="output"></div>
+<script>
+const out = document.getElementById('output');
+const overlay = document.getElementById('overlay');
+const SPEED_MULTIPLIER = 10;
+const delay = ms => ms / SPEED_MULTIPLIER;
+
+let idx = 0;
+
+overlay.addEventListener('click', () => {
+  overlay.style.display = 'none';
+  document.documentElement.requestFullscreen().catch(() => {});
+  printNext();
+});
+
+function span(text, cls) {
+  return `<span class="${cls}">${text}</span>`;
+}
+
+function hex(n) {
+  return '0x' + Math.floor(Math.random() * 0xFFFFFFFF).toString(16).padStart(8, '0');
+}
+
+function fakeAddr() {
+  const bases = ['0x7fff', '0x00007f', '0x1337', '0xdead', '0xcafe', '0xb00b'];
+  return bases[Math.floor(Math.random() * bases.length)]
+    + Math.floor(Math.random() * 0xFFFF).toString(16).padStart(4, '0')
+    + Math.floor(Math.random() * 0xFFFF).toString(16).padStart(4, '0');
+}
+
+function gadget() {
+  const regs = ['rax','rbx','rcx','rdx','rsi','rdi','r8','r9','r10','r11','r12','r13','rsp','rbp','rip'];
+  const ops = ['pop','mov','xchg','lea','add','sub','xor','ret','nop','push','jmp'];
+  const r1 = regs[Math.floor(Math.random()*regs.length)];
+  const r2 = regs[Math.floor(Math.random()*regs.length)];
+  const op = ops[Math.floor(Math.random()*ops.length)];
+  if (op === 'ret' || op === 'nop') return `${op}`;
+  if (op === 'pop' || op === 'push' || op === 'jmp') return `${op} ${r1}`;
+  return `${op} ${r1}, ${r2}`;
+}
+
+const lines = [
+  { text: `\n`, delay: 100 },
+  { text: `${span('╔══════════════════════════════════════════════════════════════╗', 'cyan')}\n`, delay: 30 },
+  { text: `${span('║', 'cyan')}  ${span('WebKit ROP Chain Generator v4.20.69', 'bold')}  ${span('(totally legit)', 'dim')}       ${span('║', 'cyan')}\n`, delay: 30 },
+  { text: `${span('║', 'cyan')}  ${span('CVE-2024-LMAO // "Operation: StackSmash"', 'yellow')}                  ${span('║', 'cyan')}\n`, delay: 30 },
+  { text: `${span('╚══════════════════════════════════════════════════════════════╝', 'cyan')}\n\n`, delay: 300 },
+
+  { text: `${span('[*]', 'yellow')} Initializing exploit framework...\n`, delay: 400 },
+  { text: `${span('[*]', 'yellow')} Loading WebKit heap feng shui module...\n`, delay: 300 },
+  { text: `${span('[+]', 'bold')} Target: Google Chrome (the one you're using right now lol)\n`, delay: 500 },
+  { text: `${span('[+]', 'bold')} Architecture: ${navigator.platform || 'x86_64'}\n`, delay: 200 },
+  { text: `${span('[+]', 'bold')} User-Agent: ${span(navigator.userAgent.substring(0, 60) + '...', 'dim')}\n`, delay: 200 },
+  { text: `${span('[!]', 'red')} WARNING: This exploit is ${span('100% real and very scary', 'red bold')}\n\n`, delay: 800 },
+
+  { text: `${span('[*]', 'yellow')} Spraying ArrayBuffers with butterfly objects...\n`, delay: 300 },
+  { text: `${span('[+]', 'bold')} Allocated 1337 JSObjects at ${span(fakeAddr(), 'magenta')}\n`, delay: 200 },
+  { text: `${span('[+]', 'bold')} Corrupted butterfly pointer: ${span(fakeAddr(), 'magenta')} -> ${span('0xdeadbeefcafebabe', 'magenta')}\n`, delay: 250 },
+  { text: `${span('[+]', 'bold')} Found JSC::Structure at offset ${span('+0x420', 'cyan')}\n`, delay: 200 },
+  { text: `${span('[*]', 'yellow')} Triggering type confusion via polymorphic inline cache...\n`, delay: 500 },
+  { text: `${span('[+]', 'bold')} addrof() primitive acquired!\n`, delay: 300 },
+  { text: `${span('[+]', 'bold')} fakeobj() primitive acquired!\n`, delay: 200 },
+  { text: `${span('[!]', 'red')} GC survived. We're in.\n\n`, delay: 600 },
+
+  { text: `${span('[*]', 'yellow')} Leaking WebCore::RenderObject vtable...\n`, delay: 400 },
+  { text: `${span('[+]', 'bold')} libwebkit2gtk base: ${span(fakeAddr(), 'magenta')}\n`, delay: 150 },
+  { text: `${span('[+]', 'bold')} __TEXT segment:     ${span(fakeAddr(), 'magenta')}\n`, delay: 150 },
+  { text: `${span('[+]', 'bold')} __DATA segment:     ${span(fakeAddr(), 'magenta')}\n`, delay: 150 },
+  { text: `${span('[+]', 'bold')} dyld_shared_cache:  ${span(fakeAddr(), 'magenta')}\n`, delay: 150 },
+  { text: `${span('[+]', 'bold')} Stack cookie:       ${span('0x00000000', 'magenta')} ${span('(lol no canary)', 'dim')}\n`, delay: 300 },
+  { text: `${span('[+]', 'bold')} ASLR slide:         ${span('0x' + 'NONE'.split('').map(c => c.charCodeAt(0).toString(16)).join(''), 'magenta')} ${span('(trust me bro)', 'dim')}\n\n`, delay: 500 },
+
+  { text: `${span('[*]', 'yellow')} Building ROP chain (${span('69 gadgets', 'bold')})...\n`, delay: 300 },
+];
+
+for (let i = 0; i < 25; i++) {
+  const addr = fakeAddr();
+  const g = gadget();
+  lines.push({
+    text: `  ${span(`[${String(i).padStart(2, '0')}]`, 'dim')} ${span(addr, 'magenta')} : ${span(g, 'cyan')}${i === 12 ? span('  // pivot stack here lmao', 'dim') : ''}${i === 7 ? span('  // "the forbidden gadget"', 'dim') : ''}${i === 20 ? span('  // found this on stackoverflow', 'dim') : ''}${i === 3 ? span('  // idk what this does but it works', 'dim') : ''}\n`,
+    delay: 60
+  });
+}
+
+lines.push(
+  { text: `\n${span('[+]', 'bold')} ROP chain constructed! Total size: ${span('0x420 bytes', 'cyan')} (nice)\n`, delay: 400 },
+  { text: `${span('[*]', 'yellow')} Overwriting saved return address...\n`, delay: 300 },
+  { text: `${span('[+]', 'bold')} RSP pivoted to fake stack at ${span(fakeAddr(), 'magenta')}\n`, delay: 200 },
+  { text: `${span('[+]', 'bold')} RIP = ${span('0x4141414141414141', 'magenta')} ${span('(classic)', 'dim')}\n\n`, delay: 500 },
+
+  { text: `${span('[*]', 'yellow')} Bypassing sandbox...\n`, delay: 400 },
+  { text: `${span('[+]', 'bold')} Mach port: ${span('0x1337', 'magenta')} ${span('(the elite port)', 'dim')}\n`, delay: 200 },
+  { text: `${span('[+]', 'bold')} task_for_pid(0) = ${span('SUCCESS', 'bold')} ${span('(kernel said "sure why not")', 'dim')}\n`, delay: 300 },
+  { text: `${span('[+]', 'bold')} Sandbox escaped via IOKit race condition #69\n`, delay: 200 },
+  { text: `${span('[!]', 'red')} ROOT ACHIEVED ${span('(jk this is just a webpage)', 'dim')}\n\n`, delay: 600 },
+
+  { text: `${span('[*]', 'yellow')} Dumping your browser secrets...\n`, delay: 500 },
+  { text: `${span('[+]', 'bold')} Passwords found: ${span('0', 'cyan')} ${span('(you use a password manager, nice)', 'dim')}\n`, delay: 300 },
+  { text: `${span('[+]', 'bold')} Cookies stolen: ${span('0', 'cyan')} ${span('(they were httponly, we respect that)', 'dim')}\n`, delay: 300 },
+  { text: `${span('[+]', 'bold')} Embarrassing bookmarks: ${span('CLASSIFIED', 'red')}\n`, delay: 400 },
+  { text: `${span('[+]', 'bold')} Tabs open: ${span('probably too many', 'cyan')}\n\n`, delay: 500 },
+
+  { text: `${span('━'.repeat(62), 'dim')}\n`, delay: 200 },
+  { text: `${span('[!]', 'red')} ${span('FINAL PAYLOAD: window.close()', 'red bold')}\n`, delay: 300 },
+  { text: `${span('[*]', 'yellow')} Executing shellcode in 3...\n`, delay: 1000 },
+  { text: `${span('[*]', 'yellow')} 2...\n`, delay: 1000 },
+  { text: `${span('[*]', 'yellow')} 1...\n`, delay: 1000 },
+  { text: `${span('[!]', 'red')} ${span('DETONATING', 'red blink bold')}\n`, delay: 500 },
+  { text: '__CLOSE__', delay: 0 },
+);
+
+function printNext() {
+  if (idx >= lines.length) return;
+  const line = lines[idx++];
+
+  if (line.text === '__CLOSE__') {
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    window.close();
+
+    setTimeout(() => {
+      out.innerHTML += `\n${span('[X]', 'red')} ${span('window.close() FAILED', 'red bold')}\n`;
+      out.innerHTML += `${span('[*]', 'yellow')} Chrome said: ${span('"lol no, only scripts can close windows they opened"', 'dim')}\n`;
+      out.innerHTML += `${span('[*]', 'yellow')} The real exploit was the friends we made along the way.\n\n`;
+      out.innerHTML += `${span('╔══════════════════════════════════════════════════════════════╗', 'cyan')}\n`;
+      out.innerHTML += `${span('║', 'cyan')}  ${span('EXPLOIT STATUS: FAILED SUCCESSFULLY', 'yellow bold')}                       ${span('║', 'cyan')}\n`;
+      out.innerHTML += `${span('║', 'cyan')}  ${span('You may now close this tab manually like a peasant.', 'dim')}       ${span('║', 'cyan')}\n`;
+      out.innerHTML += `${span('╚══════════════════════════════════════════════════════════════╝', 'cyan')}\n`;
+      window.scrollTo(0, document.body.scrollHeight);
+    }, delay(800));
+
+    return;
+  }
+
+  out.innerHTML += line.text;
+  window.scrollTo(0, document.body.scrollHeight);
+  setTimeout(printNext, delay(line.delay));
+}
+
+</script>
+</body>
+</html>
